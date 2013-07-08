@@ -56,7 +56,7 @@ class ADSWidget_Core
      */
     static function registerAdmin()
     {
-        add_options_page('Ad Widget', 'Ad Widget', 'edit_pages', 'adwidget.php', array(__CLASS__, 'adminMenuCallback'));
+        //add_options_page('Ad Widget', 'Ad Widget', 'edit_pages', 'adwidget.php', array(__CLASS__, 'adminMenuCallback'));
     }
 
     /**
