@@ -17,8 +17,8 @@ add_action('admin_menu', array('ADSWidget_Core', 'registerAdmin'));
  */
 class ADSWidget_Core
 {
-    CONST VERSION = '2.1.6';
-    
+    CONST VERSION = '1.0';
+
     /**
      * The callback used to register the scripts
      */
@@ -32,7 +32,7 @@ class ADSWidget_Core
             wp_enqueue_script('adwidget-main',  self::getBaseURL().'assets/widgets.js');
         }
     }
-    
+
     /**
      * The callback used to register the widget
      */
@@ -41,16 +41,16 @@ class ADSWidget_Core
         register_widget('IMGAdd_Widget');
         register_widget('HTMLAdd_Widget');
     }
-    
+
     /**
      * Get the base URL of the plugin installation
      * @return string the base URL
      */
     public static function getBaseURL()
-    {   
-        return (get_bloginfo('url') . '/wp-content/plugins/ad-widget/');
+    {
+        return (get_bloginfo('url') . '/wp-content/plugins/m_publicidad/');
     }
-    
+
     /**
      * Register the admin settings page
      */
@@ -67,14 +67,14 @@ class ADSWidget_Core
         self::sendInstallReportIfNew();
         include dirname(__FILE__) . '/views/admin.php';
     }
-    
+
     /**
      * Makes a call to the Broadstreet service to collect information information
      *  on the blog in case of errors and other needs.
      */
     public static function sendReport($message = 'General')
     {
-        
+
 
     }
 
@@ -87,7 +87,7 @@ class ADSWidget_Core
     {
 
     }
-    
+
     /**
      * Sets a Wordpress option
      * @param string $name The name of the option to set
@@ -160,17 +160,21 @@ class IMGAdd_Widget extends WP_Widget
             $resize = "style='width: 100%;'";
         }
 
-        echo $before_widget;
+         if(!$img)
+         {
+             $img  = ADSWidget_Core::getBaseURL() . 'assets/sample-ad.png';
+             $link = 'http://www.elmercurio.com.ec';
+         }
 
-        if(!$img)
-        {
-            $img  = ADSWidget_Core::getBaseURL() . 'assets/sample-ad.png';
-            $link = 'http://adsofthefuture.com';
-        }
 
-        echo "<a target='_blank' href='$link' alt='Ad'><img $resize src='$img' alt='Ad' /></a>";
-
-        echo $after_widget;
+         $banner  = '<ul class="thumbnails">';
+         $banner .= '<li class="span12">';
+         $banner .= '<div class="thumbnail">';
+         $banner .= '<a target="_blank" href="' . $link . '" ><img ' .$resize . 'src="' . $img . '"/></a>';
+         $banner .= '</div>';
+         $banner .= '</li>';
+         $banner .= '</ul>';
+         echo $banner;
      }
 
      /**
