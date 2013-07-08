@@ -169,7 +169,7 @@ class IMGAdd_Widget extends WP_Widget
 
          $banner  = '<ul class="thumbnails">';
          $banner .= '<li class="span12">';
-         $banner .= '<div class="thumbnail">';
+         $banner .= '<div class="thumbnail publicidad">';
          $banner .= '<a target="_blank" href="' . $link . '" ><img ' .$resize . 'src="' . $img . '"/></a>';
          $banner .= '</div>';
          $banner .= '</li>';
