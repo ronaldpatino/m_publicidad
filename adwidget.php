@@ -12,13 +12,15 @@ add_action('admin_init', array('ADSWidget_Core', 'registerScripts'));
 add_action('widgets_init', array('ADSWidget_Core', 'registerWidgets'));
 add_action('admin_menu', array('ADSWidget_Core', 'registerAdmin'));
 
+
 /**
  * This class is the core of Ad Widget
  */
 class ADSWidget_Core
 {
     CONST VERSION = '1.0';
-
+		
+	
     /**
      * The callback used to register the scripts
      */
@@ -56,7 +58,7 @@ class ADSWidget_Core
      */
     static function registerAdmin()
     {
-        //add_options_page('Ad Widget', 'Ad Widget', 'edit_pages', 'adwidget.php', array(__CLASS__, 'adminMenuCallback'));
+        //add_options_page('M_Publicidad', 'M_Publicidad', 'manage_options', 'admin.php', array(__CLASS__, 'adminMenuCallback'));
     }
 
     /**
@@ -65,7 +67,7 @@ class ADSWidget_Core
     static function adminMenuCallback()
     {
         self::sendInstallReportIfNew();
-        include dirname(__FILE__) . '/views/admin.php';
+        include dirname(__FILE__) . '/admin.php';
     }
 
     /**
@@ -154,27 +156,61 @@ class IMGAdd_Widget extends WP_Widget
         $link   = @$instance['w_link'];
         $img    = @$instance['w_img'];
         $resize = @$instance['w_resize'];
+		$blank  = ADSWidget_Core::getBaseURL() . 'assets/blank.png';
 
-        if($resize == 'yes')
-        {
-            $resize = "style='width: 100%;'";
-        }
+        
 
-         if(!$img)
-         {
-             $img  = ADSWidget_Core::getBaseURL() . 'assets/sample-ad.png';
-             $link = 'http://www.elmercurio.com.ec';
-         }
+		if(!$img)
+		{
+		 $img  = ADSWidget_Core::getBaseURL() . 'assets/sample-ad.png';
+		 $link = 'http://www.elmercurio.com.ec';
+		}
 
+		$size = getimagesize($img);
 
-         $banner  = '<ul class="thumbnails">';
-         $banner .= '<li class="span12">';
-         $banner .= '<div class="thumbnail publicidad">';
-         $banner .= '<a target="_blank" href="' . $link . '" ><img ' .$resize . 'src="' . $img . '"/></a>';
-         $banner .= '</div>';
-         $banner .= '</li>';
-         $banner .= '</ul>';
-         echo $banner;
+		if ($size[0] >= 728 && $resize != 1)
+		{
+			 $banner  = '<ul class="thumbnails">';
+			 $banner .= '<li class="span1 hidden-phone">';        
+			 $banner .= '<img src="' . $blank . '"/>';
+			 $banner .= '</li>';
+			 $banner .= '<li class="span10">';         
+			 $banner .= '<a class="thumbnail publicidad" target="_blank" href="' . $link . '" ><img src="' . $img . '"/></a>';         
+			 $banner .= '</li>';
+			 $banner .= '<li class="span1 hidden-phone">';        
+			 $banner .= '<img src="' . $blank . '"/>';
+			 $banner .= '</li>';
+			 $banner .= '</ul>';	
+			
+			  echo $banner;
+		}
+						
+		 
+		 if ($size[0] >= 300 && $size[0] <= 300 )
+		{
+			 $banner  = '<ul class="thumbnails">';
+			 
+			 $banner .= '<li class="span12">';         
+			 $banner .= '<a class="thumbnail publicidad" target="_blank" href="' . $link . '" ><img src="' . $img . '"/></a>';         
+			 $banner .= '</li>';
+			 
+			 $banner .= '</ul>';			
+			   echo $banner;
+		} 
+
+		if ($size[0] >= 480 && $size[0] <= 480)
+		{
+			 $banner  = '<ul class="thumbnails">';
+			 
+			 $banner .= '<li class="span10">';         
+			 $banner .= '<a class="thumbnail publicidad" target="_blank" href="' . $link . '" ><img src="' . $img . '"/></a>';         
+			 $banner .= '</li>';
+			 
+			 $banner .= '</ul>';			
+			   echo $banner;
+		}
+		
+        
      }
 
      /**
@@ -214,8 +250,8 @@ class IMGAdd_Widget extends WP_Widget
         <div class="widget-content">
        <p style="text-align: center;" class="bs-proof">
            <?php if($instance['w_img']): ?>
-                Your ad is ready.
-                <br/><br/><strong>Scaled Visual:</strong><br/>
+                Publicidad agregada.
+                <br/><br/><strong>Vista Previa:</strong><br/>
                 <div class="bs-proof"><img style="width:100%;" src="<?php echo $instance['w_img'] ?>" alt="Ad" /></div>
            <?php else: ?>
                 <a href="#" class="upload-button" rel="<?php echo $img_id ?>">Subir una nueva imagen.</a>
@@ -229,8 +265,8 @@ class IMGAdd_Widget extends WP_Widget
             <input class="widefat" type="text" id="<?php echo $this->get_field_id('w_link'); ?>" name="<?php echo $this->get_field_name('w_link'); ?>" value="<?php echo $instance['w_link']; ?>" />
         </p>
        <p>
-           <label for="<?php echo $this->get_field_id('w_resize'); ?>">Ancho M&aacute;ximo por defecto? </label>
-           <input type="checkbox" name="<?php echo $this->get_field_name('w_resize'); ?>" value="yes"  <?php if($instance['w_resize'] == 'yes') echo 'checked'; ?> />
+           <label for="<?php echo $this->get_field_id('w_resize'); ?>">Espacio Compartido con otra Publicidad? </label>
+           <input type="checkbox" name="<?php echo $this->get_field_name('w_resize'); ?>" value="1"  <?php if($instance['w_resize'] == 1) echo 'checked'; ?> />
        </p>
 
         </div>
@@ -309,7 +345,31 @@ class HTMLAdd_Widget extends WP_Widget
         echo $form;
     }
 }
+/*
 
 
+function mpublicidad_activate() {
 
+    global $wpdb;
+	$table_name = $wpdb->prefix . "mpublicidad";
+	
+	if($wpdb->get_var("show tables like '$table_name'") != $table_name) {
+      $sql = "CREATE TABLE " . $table_name . " (
+          `id` int(9) NOT NULL auto_increment,
+          `nombre_banner` text,
+          `ancho_banner` int(11) NOT NULL default '0',
+		  `alto_banner` int(11) NOT NULL default '0',          
+           UNIQUE KEY id (id)
+            );";
+        require_once(ABSPATH . 'wp-admin/includes/upgrade.php');
+        dbDelta($sql);
+    }
+	
+}
+register_activation_hook( __FILE__, 'mpublicidad_activate' );
 
+function mpublicidad_deactivate() {
+
+}
+register_deactivation_hook( __FILE__, 'mpublicidad_deactivate' );
+*/
