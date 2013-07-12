@@ -156,6 +156,8 @@ class IMGAdd_Widget extends WP_Widget
         $link   = @$instance['w_link'];
         $img    = @$instance['w_img'];
         $resize = @$instance['w_resize'];
+		$medidas = @$instance['w_medidas'];
+		
 		$blank  = ADSWidget_Core::getBaseURL() . 'assets/blank.png';
 
         
@@ -166,16 +168,16 @@ class IMGAdd_Widget extends WP_Widget
 		 $link = 'http://www.elmercurio.com.ec';
 		}
 
-		$size = getimagesize($img);
+		
 
-		if ($size[0] >= 728 && $resize != 1)
+		if ($medidas == 1 && $resize !=1)
 		{
-			 $banner  = '<ul class="thumbnails">';
+			 $banner  = '<ul class="thumbnails publicidad">';
 			 $banner .= '<li class="span1 hidden-phone">';        
 			 $banner .= '<img src="' . $blank . '"/>';
 			 $banner .= '</li>';
 			 $banner .= '<li class="span10">';         
-			 $banner .= '<a class="thumbnail publicidad" target="_blank" href="' . $link . '" ><img src="' . $img . '"/></a>';         
+			 $banner .= '<a class="thumbnail-custom" target="_blank" href="' . $link . '" ><img src="' . $img . '"/></a>';         
 			 $banner .= '</li>';
 			 $banner .= '<li class="span1 hidden-phone">';        
 			 $banner .= '<img src="' . $blank . '"/>';
@@ -184,26 +186,39 @@ class IMGAdd_Widget extends WP_Widget
 			
 			  echo $banner;
 		}
+		
 						
 		 
-		 if ($size[0] >= 300 && $size[0] <= 300 )
+		if ($medidas == 2 && $resize !=1)
 		{
-			 $banner  = '<ul class="thumbnails">';
+			 $banner  = '<ul class="thumbnails publicidad">';
 			 
 			 $banner .= '<li class="span12">';         
-			 $banner .= '<a class="thumbnail publicidad" target="_blank" href="' . $link . '" ><img src="' . $img . '"/></a>';         
+			 $banner .= '<a class="thumbnail-custom" target="_blank" href="' . $link . '" ><img src="' . $img . '"/></a>';         
 			 $banner .= '</li>';
 			 
 			 $banner .= '</ul>';			
 			   echo $banner;
 		} 
 
-		if ($size[0] >= 480 && $size[0] <= 480)
+		if ($medidas == 3 && $resize !=1)
 		{
-			 $banner  = '<ul class="thumbnails">';
+			 $banner  = '<ul class="thumbnails publicidad">';
 			 
-			 $banner .= '<li class="span10">';         
-			 $banner .= '<a class="thumbnail publicidad" target="_blank" href="' . $link . '" ><img src="' . $img . '"/></a>';         
+			 $banner .= '<li class="span12">';         
+			 $banner .= '<a class="thumbnail-custom" target="_blank" href="' . $link . '" ><img src="' . $img . '"/></a>';         
+			 $banner .= '</li>';
+			 
+			 $banner .= '</ul>';			
+			 echo $banner;
+		} 		
+		
+		if ($medidas == 4 && $resize !=1)
+		{
+			 $banner  = '<ul class="thumbnails publicidad">';
+			 
+			 $banner .= '<li class="span12">';         
+			 $banner .= '<a class="thumbnail-custom" target="_blank" href="' . $link . '" ><img src="' . $img . '"/></a>';         
 			 $banner .= '</li>';
 			 
 			 $banner .= '</ul>';			
@@ -226,6 +241,7 @@ class IMGAdd_Widget extends WP_Widget
         $instance['w_link']    = $new_instance['w_link'];
         $instance['w_img']     = $new_instance['w_img'];
         $instance['w_resize']  = $new_instance['w_resize'];
+		$instance['w_medidas']  = $new_instance['w_medidas'];
 
         return $instance;
      }
@@ -245,6 +261,7 @@ class IMGAdd_Widget extends WP_Widget
 
         $img = $instance['w_img'];
         $link = $instance['w_link'];
+		$w_medidas = isset($instance['w_medidas'])?$instance['w_medidas']:1;
 
        ?>
         <div class="widget-content">
@@ -264,14 +281,36 @@ class IMGAdd_Widget extends WP_Widget
             <label for="<?php echo $this->get_field_id('w_link'); ?>">Enlace del Click:</label><br/>
             <input class="widefat" type="text" id="<?php echo $this->get_field_id('w_link'); ?>" name="<?php echo $this->get_field_name('w_link'); ?>" value="<?php echo $instance['w_link']; ?>" />
         </p>
-       <p>
-           <label for="<?php echo $this->get_field_id('w_resize'); ?>">Espacio Compartido con otra Publicidad? </label>
-           <input type="checkbox" name="<?php echo $this->get_field_name('w_resize'); ?>" value="1"  <?php if($instance['w_resize'] == 1) echo 'checked'; ?> />
+		<p>
+           <label for="<?php echo $this->get_field_id('w_medidas'); ?>">Medidas del Banner </label>
+			<select name="<?php echo $this->get_field_name('w_medidas'); ?>">
+				<option value="1" <?php $this->is_selected($w_medidas, 1)?>>728x90</option>
+				<option value="2" <?php $this->is_selected($w_medidas, 2)?>>300x250</option>
+				<option value="3" <?php $this->is_selected($w_medidas, 3)?>>230x90</option>
+				<option value="4" <?php $this->is_selected($w_medidas, 4)?>>468x60</option>
+			</select>
        </p>
+       
+           
+        <input type="hidden" name="<?php echo $this->get_field_name('w_resize'); ?>" value="0" />
+       
 
         </div>
        <?php
      }
+	 
+	 
+	 
+	 private function is_selected($selected, $item)
+	 {	 
+		if ($selected == $item)
+		{
+			echo 'selected="selected"';
+			return;
+		}
+		echo '';		
+		return;
+	 }
 }
 
 
@@ -301,12 +340,8 @@ class HTMLAdd_Widget extends WP_Widget
     function widget($args, $instance)
     {
         extract($args);
-
-        echo $before_widget;
-
-        echo "<div style='text-align: center;'>{$instance['w_adcode']}</div>";
-
-        echo $after_widget;
+		
+        echo $instance['w_adcode'];
     }
 
     /**
